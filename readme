@@ -15,14 +15,19 @@ The xml, typically with the following structure:
 
 ## Using the module: some simple examples
 
+First save the module in your Python Module Search Path (PMSP)
+    
+    
+    
+
+
 An xml can be imported as follows:
 
     df = open('aesop.xml', 'r', encoding="utf8").read()
     data = treesearch(df)
     data.show()
 
-
-This will display a dataframe.
+This will display a dataframe
 
 
 
