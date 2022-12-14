@@ -17,11 +17,10 @@ The xml, typically with the following structure:
 
 An xml can be imported as follows:
 
-```
-df = open('aesop.xml', 'r', encoding="utf8").read()
-data = treesearch(df)
-data.show()
-```
+    df = open('aesop.xml', 'r', encoding="utf8").read()
+    data = treesearch(df)
+    data.show()
+
 
 This will display a dataframe.
 
