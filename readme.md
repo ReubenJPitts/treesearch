@@ -1,4 +1,4 @@
-## Quering Treebanks with Python: The *treesearch* Module
+## Querying Treebanks with Python: The *treesearch* Module
 
 ### Introduction
 
@@ -49,6 +49,7 @@ from treesearch import treesearch
 
 #includes:
 #import pandas as pd
+#import numpy as np
 #import re
 ~~~
 
@@ -83,7 +84,7 @@ print(csv)
 ~~~
 
 
-## Part 1: General Functionalities
+### Part 1: General Functionalities
 
 A treesearch object is essentially a pandas DataFrame augmented with some further functions.
 
@@ -135,7 +136,7 @@ l = list(set(l1) & set(l2) & set(l3))
 
 
 
-## Part 2: Topological "Dumb" Functions
+### Part 2: Topological "Dumb" Functions
 
 A first set of syntactic functions are described here as "topological" (or "dumb") functions, which just perform searches based on the tree topology and do not understand that syntactic relationships are not always hierarchical.
 
@@ -151,7 +152,7 @@ data.tree_children(102)                 #returns a list of all topological child
 For queries where coordination and Aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for more purposes (and much faster than the "smart" functions).
 
 
-## Part 3: Syntactic "Smart" Functions
+### Part 3: Syntactic "Smart" Functions
 
 A second set of syntactic functions understands coordination and aux relations, and finds the tokens a researcher is likely to be primarily interested in.
 
@@ -161,12 +162,61 @@ data.smart_daughters(102)               #returns the true syntactic daughter(s) 
 data.smart_siblings(100)                #returns fellow coordinands of the current word id (if any) -> [100]
 ~~~
 
-## Some More Complex Examples
+### Some More Complex Examples
 
-These examples show how to use the treesearch module to construct limitlessly complex syntactic searches.
+These examples show how to use the treesearch module to construct limitlessly complex syntactic searches. First import the CEIPoM database:
 
+~~~
+from treesearch import treesearch
 
+xml = open('~CEIPoM.xml', 'r', encoding="utf8").read()
+data = treesearch(xml)
 
+show(data)
+~~~
+
+**Are objects more likely to be preposed or postposed?**
+
+At its most basic level, this search is relatively simple (and could be performed without the *treesearch* module):
+
+~~~
+l = data.subset("relation","OBJ")                 #first filter relevant word ids
+l = [(i,data.direct_tree_parent(i)) for i in l]   #get the parent of each id
+l = [i < j for i,j in l]                          #check if the head's token_id is greater or smaller
+
+l.count(True)
+l_count(False)
+~~~
+
+However, objects may be coordinated (thus OBJ_CO), and we don't want to count them twice. Moreover, if they're linked to their head via an Aux, or if their head is coordinated, or if their head isn't topologically superordinate, we don't want to miss them.
+
+This is where the *treesearch* module becomes useful. We formulate the same query, but with a smart function:
+
+~~~
+l = data.regex_subset("relation","OBJ.*")         #so that we don't filter out OBJ_CO
+
+result = []
+check = []
+
+for i in l:
+    s = data.smart_siblings(i)                    #get all fellow coordinands
+    if sorted(s) in check:
+        continue                                  #if we've already had one of its coordinands, skip this iteration
+    check.append(sorted(s))
+    p = data.smart_parents(i)                     #get all parents
+    
+    if max(s) < min(p):                           #check if all coordinands precede all parents
+        result.append(True)
+    elif max(p) < min(s):                         #check if all parents precede all coordinands
+        result.append(False)
+    else:                                         #some objects precede while others follow, and similar cases
+        result.append(None)
+
+l.count(True)
+l_count(False)
+~~~
+
+**Are objects more likely to be preposed or postposed depending on whether they are in a main clause or not?**
 
 
 
