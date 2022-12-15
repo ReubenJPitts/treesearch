@@ -92,15 +92,57 @@ data.export()           #exports the treesearch object as a pandas DataFrame
 ~~~
 
 
+The module revolves around word IDs, which are the basis of all syntactic functions. These IDs can be exchanged for various other forms of more human-interpretable information as follows:
 
-
-
-from treesearch import treesearch
-df = open('~aesop.xml', 'r', encoding="utf8").read()
+~~~
+data.form("fefaked")         #returns a list of all word ids for which the form is "fefaked" -> [102]
+data.token(102)              #returns the form for a given word id -> "fefaked"
+data.tokens([101,102])       #returns the form for a list of word ids -> ['med', 'fefaked']
+data.relation(102)           #returns the relation of the specified word id -> "PRED"
+data.sentence_id(102)        #returns the sentence id of the specified word id -> 1
+data.sentence(102)           #returns a list of all word ids in the same sentence -> [100, 101, 102, 103]
+data.pos(102)                #returns the POS tag of the current word id -> ""
+data.lemma(102)              #returns the lemma of the current word id -> "facio"
 ~~~
 
-data = treesearch(df)
-data.show()
+As the "smart" functions below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested in the word order of accusative objects,
+
+
+## Part 2: Topological "Dumb" Functions
+
+A first set of syntactic functions are described here as "topological" (or "dumb") functions, which just perform searches based on the tree topology and do not understand that syntactic relationships are not always hierarchical.
+
+The basic underlying functions are the following:
+
+~~~
+data.direct_tree_parent(100)            #returns the direct topological parent as an integer -> 102
+data.tree_parents(100)                  #returns a list of topological parents in order to the root -> [102, 0]
+data.direct_tree_children(102)          #returns a list of direct topological children -> [100, 101, 103]
+data.tree_children(102)                 #returns a list of all topological children (regardless of how many nodes removed) -> [100, 101, 103]
 ~~~
 
-This will display a dataframe
+For queries where coordination and Aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for more purposes (and much faster than the "smart" functions).
+
+
+## Part 3: Syntactic "Smart" Functions
+
+A second set of syntactic functions understands coordination and aux relations, and finds the tokens a researcher is likely to be primarily interested in.
+
+~~~
+data.smart_parents(100)                 #returns the true syntactic parent(s) of the current word id -> [102]
+data.smart_daughters(102)               #returns the true syntactic daughter(s) of the current word id -> [100, 101, 103]
+data.smart_siblings(100)                #returns fellow coordinands of the current word id (if any) -> [100]
+~~~
+
+## Some More Complex Examples
+
+These examples show how to use the treesearch module to construct limitlessly complex syntactic searches.
+
+
+
+
+
+
+
+
+
