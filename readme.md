@@ -150,14 +150,14 @@ data.information("Token_position",165258)      #a more flexible function which d
 As the "smart" functions introduced below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
 
 ~~~
-data.subset("Lemma","10350a")                  #returns a list of ids where lemma = "video1" -> [155, 162]
-data.subset("Token","fefaked")                 #returns a list of ids where form = "fefaked" -> [102]
+data.subset("Lemma","10350a")                  #returns a list of ids where lemma = "10350a"
+data.subset("Token","fefaked")                 #returns a list of ids where form = "fefaked"
 ~~~
 
 If we wish to use more precise POS searches, the regex equivalent of this function should be used. So to filter accusative nouns:
 
 ~~~
-data.regex_subset("pos","n......a.")           #returns a list of ids where the POS indicates an accusative noun -> [142, 152]
+data.regex_subset("pos","n......a.")           #returns a list of ids where the POS indicates an accusative noun
 ~~~
 
 Use the intersection of lists to filter by multiple criteria
