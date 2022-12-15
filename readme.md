@@ -536,6 +536,8 @@ acc = data.regex_subset("POS",".......a.")             # find all accusatives in
 result = []
 
 for i in l:
+    print(l.index(i),len(l))                           # give updates on progress (as this will take a while to run)
+    
     c = data.smart_children(i)                         # get the syntactic children of each finite verb form
     if len(c) > 0:
         r = [data.relation(i) for i in c]              # get the relations of those children
@@ -551,8 +553,6 @@ for i in l:
             result.append(True)                        # indicate trivalent verbs
         else:
             result.append(False)
-        
-        print(l.index(i),len(l))
 
 l = [j for i,j in enumerate(l) if result[i] == True]                # this is now a list of all trivalent verbs in the corpus
 l = [data.information("Classical_Latin_equivalent",i) for i in l]   # get the cross-linguistic Latin lemma
