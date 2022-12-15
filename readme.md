@@ -16,7 +16,7 @@
 
 ## Introduction
 
-The Python module *treesearch* contains a set of functions designed to query AGDT 2.0 treebanks. Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
+The Python module *treesearch* contains a set of functions designed to query treebanks following the [AGDT 2 annotation scheme](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md). Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
 
 The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher.
 
