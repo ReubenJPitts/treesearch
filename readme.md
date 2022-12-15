@@ -6,6 +6,8 @@ The Python module *treesearch* contains a set of functions designed to query AGD
 
 The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher.
 
+The module is designed for small ("fragmentary") datasets where a researcher needs results to be accurate and exhaustive, and can't afford to miss results just because the tree topology does something funny. Examples are illustrated using the [CEIPoM](https://github.com/ReubenJPitts/Corpus-of-the-Epigraphy-of-the-Italian-Peninsula-in-the-1st-Millennium-BCE) database of ancient Italian epigraphy.
+
 
 ## Initialising the module
 
@@ -13,13 +15,11 @@ Having saved the treesearch.py file in the Python Module Search Path, summon it 
 
 ~~~
 from treesearch import treesearch
-
-#this includes:
-#import pandas as pd
-#import re
 ~~~
 
-The module accepts csv files and xml files. In both cases, each token minimally needs to specify a "Sentence_ID", "Token_ID", "Relation" and "Head", otherwise the code will not work (the code will convert the Perseids "word id", "sentence id", "relation" and "head" automatically). Thus, for instance, an xml file can be imported as a string:
+This also imports the dependencies pandas and re.
+
+The module accepts csv files and xml files. In both cases, each token minimally needs to specify a "Sentence_ID", "Token_ID", "Relation" and "Head", otherwise the code will not work (the code will convert the Perseids headings "word id", "sentence id", "relation" and "head" automatically). Thus, for instance, an xml file can be imported as a string:
 
 ~~~
 xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
@@ -49,10 +49,12 @@ print(csv)
 5       105      horto   ADV_CO   104          200
 ~~~
 
+The *treesearch* module will convert both the csv and the xml into a pandas DataFrame for all subsequent operations.
+
 For the examples in this vademecum, the file in the Github repository can be summoned as:
 
 ~~~
-df = pd.read_csv("CEIPoM_syntax.csv", delimiter=";")
+df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
 data = treesearch(df)
 data.show()
 
@@ -72,8 +74,7 @@ data.show()
 [37041 rows x 21 columns]
 ~~~
 
-Note that this dataframe contains more columns than the obligatory ones noted above. This makes more interesting linguistic queries possible.
-
+Note that this DataFrame contains more columns than the obligatory ones noted above. This makes more interesting linguistic queries possible, as will be shown in the examples.
 
 ## General Functionalities
 
@@ -131,42 +132,45 @@ data.visualise(5, x=input, y=output)
 0 - 165262 - 165267 - 165266 -  - SBJ - uirco
 ~~~
 
-The module revolves around word IDs (or Token_IDs), which are the basis of all syntactic functions. These IDs can be exchanged for various other forms of more human-interpretable information as follows:
+The module revolves around word IDs (or Token_IDs), which are the basis of all syntactic functions. These IDs can be exchanged for various other pieces of information using a number of simple functions such as the following:
 
 ~~~
-data.form("deivos")          #returns a list of all word ids for which the form is "fefaked" -> [165258]
-data.token(165258)           #returns the form for a given word id -> "deivos"
-data.tokens([101,102])       #returns the form for a list of word ids -> ['med', 'fefaked']
-data.relation(102)           #returns the relation of the specified word id -> "PRED"
-data.sentence_id(102)        #returns the sentence id of the specified word id -> 1
-data.sentence(102)           #returns a list of all word ids in the same sentence -> [100, 101, 102, 103]
-data.pos(102)                #returns the POS tag of the current word id -> ""
-data.lemma(102)              #returns the lemma of the current word id -> "facio"
-data.information("Token_position",102)      #a more flexible function which deals with any columns that don't have custom functions
+data.form("deivos")             #returns a list of all word ids for which the form is "deivos" (-> [165258])
+data.token(165258)              #returns the form for a given word id (in this case -> "deivos")
+data.tokens([165258,165259])    #returns the form for a list of word ids
+data.relation(165258)           #returns the relation of the specified word id (if given a list, will try to give the relation of its first element)
+data.sentence_id(165258)        #returns the sentence id of the specified word id
+data.sentence(165258)           #returns a list of all word ids in the same sentence
+data.pos(165258)                #returns the POS tag of the current word id (if there is one)
+data.lemma(165258)              #returns the lemma of the current word id (if there is one)
+
+data.information("Token_position",165258)      #a more flexible function which deals with any columns that don't have custom functions
 ~~~
 
-As the "smart" functions below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
+As the "smart" functions introduced below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
 
 ~~~
-data.subset("lemma","video1")            #returns a list of ids where lemma = "video1" -> [155, 162]
-data.subset("form","fefaked")            #returns a list of ids where form = "fefaked" -> [102]
+data.subset("Lemma","10350a")                  #returns a list of ids where lemma = "video1" -> [155, 162]
+data.subset("Token","fefaked")                 #returns a list of ids where form = "fefaked" -> [102]
 ~~~
 
 If we wish to use more precise POS searches, the regex equivalent of this function should be used. So to filter accusative nouns:
 
 ~~~
-data.regex_subset("pos","n......a.")            #returns a list of ids where the POS indicates an accusative noun -> [142, 152]
+data.regex_subset("pos","n......a.")           #returns a list of ids where the POS indicates an accusative noun -> [142, 152]
 ~~~
 
 Use the intersection of lists to filter by multiple criteria
 
 ~~~
-l1 = data.subset("form","consilia")                  #returns ids where form = "consilia"
-l2 = data.regex_subset("pos",".......a.")            #returns ids where case = accusative
-l3 = data.regex_subset("pos","n........")            #returns ids where part of speech = noun
+l1 = data.subset("Token","consilia")           #returns ids where form = "consilia"
+l2 = data.regex_subset("pos",".......a.")      #returns ids where case = accusative
+l3 = data.regex_subset("pos","n........")      #returns ids where part of speech = noun
 
 l = list(set(l1) & set(l2) & set(l3))
 ~~~
+
+The resulting trimmed-down list of Token_IDs can then be fed into more interesting syntactic functions.
 
 
 
@@ -177,10 +181,10 @@ A first set of syntactic functions are described here as "topological" (or "dumb
 The basic underlying functions are the following:
 
 ~~~
-data.direct_tree_parent(100)            #returns the direct topological parent as an integer -> 102
-data.tree_parents(100)                  #returns a list of topological parents in order to the root -> [102, 0]
-data.direct_tree_children(102)          #returns a list of direct topological children -> [100, 101, 103]
-data.tree_children(102)                 #returns a list of all topological children (regardless of how many nodes removed) -> [100, 101, 103]
+data.direct_tree_parent(165258)            #returns the direct topological parent as an integer
+data.tree_parents(165258)                  #returns a list of topological parents in order to the root
+data.direct_tree_children(165258)          #returns a list of direct topological children
+data.tree_children(165258)                 #returns a list of all topological children (regardless of how many nodes removed)
 ~~~
 
 For queries where coordination and Aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for more purposes (and much faster than the "smart" functions).
@@ -191,19 +195,19 @@ For queries where coordination and Aux relations are irrelevant, or datasets lar
 A second set of syntactic functions understands coordination and aux relations, and finds the tokens a researcher is likely to be primarily interested in.
 
 ~~~
-data.smart_parents(100)                 #returns the true syntactic parent(s) of the current word id -> [102]
-data.smart_daughters(102)               #returns the true syntactic daughter(s) of the current word id -> [100, 101, 103]
-data.smart_siblings(100)                #returns fellow coordinands of the current word id (if any) -> [100]
+data.smart_parents(165258)                 #returns the true syntactic parent(s) of the current word id
+data.smart_daughters(165258)               #returns the true syntactic daughter(s) of the current word id
+data.smart_siblings(165258)                #returns fellow coordinands of the current word id (if any)
 ~~~
 
 Let's find a tree with some COORD and Aux, to illustrate the power of these functions.
 
 ~~~
 lat = data.regex_subset("Language","Latin")       #let's limit to Latin for illustrative purposes
-cos = data.regex_subset("Relation","_CO")       #find some Token_IDs with "_CO"
-aux = data.regex_subset("Relation","Aux")       #find some Token_IDs with "Aux"
+cos = data.regex_subset("Relation","_CO")         #find some Token_IDs with "_CO"
+aux = data.regex_subset("Relation","Aux")         #find some Token_IDs with "Aux"
 
-s1 = [data.sentence_id(i) for i in cos]              #get the intersection of their Sentence_IDs (we're not just interested in individual words)
+s1 = [data.sentence_id(i) for i in cos]           #get the intersection of their Sentence_IDs (we're not just interested in individual words)
 s2 = [data.sentence_id(i) for i in aux]
 s3 = [data.sentence_id(i) for i in lat]
 
@@ -248,7 +252,7 @@ data.visualise(s[6])
 0 - 502035 - 515240 - 418500 -  - OBJ - cei/p()
 ~~~
 
-Translation: *At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.* The syntactic analysis in this case is a little dubious, but this will allow the "smart" syntactic functions to be demonstrated all the more clearly.
+Translation: *At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up (?) pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.* The syntactic analysis in this case is a little dubious, but the interpretation of the adverbials as dependent on both coordinated verbs will allow the "smart" syntactic functions to be demonstrated all the more clearly.
 
 Imagine that we want to find the parent of *finem* "boundary" (Token_ID 418502). Using the "dumb" function, this finds:
 
