@@ -35,11 +35,17 @@ print(xml[1340:1770])
     <word id='3' form='κακά' lemma='κακός' postag='a-p---nn-' relation='ExD_CO' ref='' sg='sbs nmn ind ctc' gloss='bad' head='2'/>
 ~~~
 
-A csv file, meanwhile, can be imported similarly: 
+A treesearch object is created with:
+
+~~~
+data = treesearch(xml)
+~~~
+
+A csv file, meanwhile, can be imported through a similar process: 
 
 ~~~
 df = pd.read_csv("treebank.csv", delimiter=";")
-print(csv)
+print(df)
     word id       form relation  head  sentence id
 0       100        heu      Aux     0          200
 1       101        ego      SBJ   112          200
@@ -47,6 +53,8 @@ print(csv)
 3       103       domo   ADV_CO   104          200
 4       104         et    COORD   102          200
 5       105      horto   ADV_CO   104          200
+
+data = treesearch(df)
 ~~~
 
 The *treesearch* module will convert both the csv and the xml into a pandas DataFrame for all subsequent operations.
