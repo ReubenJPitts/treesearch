@@ -1,10 +1,43 @@
-## Quering Treebanks with Python: The *treesearch* module
+## Quering Treebanks with Python: The *treesearch* Module
 
 ### Introduction
 
 The Python module *treesearch* contains a set of functions designed to query AGDT 2.0 treebanks. Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
 
 The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher. Additionally, the module is capable of checking whether trees are well-formed and warns the researcher of loops or other annotational errors.
+
+
+### Using the Module: A Simple Example
+
+~~~
+from treesearch import treesearch
+
+xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
+data = treesearch(xml)
+xml.show(1)
+~~~
+
+This shows the first sentence:
+~~~
+          Sentence_ID  Head Relation Lemma     Token
+Token_ID                                            
+100                 1   102      SBJ          manios
+101                 1   102      OBJ             med
+102                 1     0     PRED         fefaked
+103                 1   102      OBJ        numasioi
+~~~
+
+Some syntactic queries might be as follows:
+~~~
+xml.smart_children(102)
+[100, 101, 103]
+
+xml.smart_parents(100)
+[102]
+
+xml.tree_parents(100)
+[102, 0]
+~~~
 
 
 ### Initialising the module
@@ -18,10 +51,10 @@ from treesearch import treesearch
 The module accepts csv files and xml files. In both cases, each token minimally to specify a "sentence id", "word id", "relation" and "head", otherwise the code will not work. Thus, for instance, an xml file can be imported as a string:
 
 ~~~
-xml = open('~aesop.xml', 'r', encoding="utf8").read()
+xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
 ~~~
 
-The xml will contain lines formatted as follows. Word IDs can be numbered sequentially throughout the file, or start again from 1 in each sentence. As long as the word ID and head ID are annotated consistently, the module can deal with this. 
+The xml will contain lines formatted as shown below. Word IDs can be numbered sequentially throughout the file, or start again from 1 in each sentence. As long as the word ID and head ID are annotated consistently, the module can deal with this. 
 
 ~~~
 print(xml[1340:1770])
@@ -46,11 +79,22 @@ print(csv)
 ~~~
 
 
-## Using the module: some simple examples
+## Part 1: General Functionalities
 
-A simple test xml is provided in.
+A treesearch object is essentially a pandas DataFrame augmented with some further functions.
 
 ~~~
+data = treesearch(xml)
+
+data.show()             #prints the DataFrame
+data.show(1)            #prints the part of the DataFrame specified by the sentence id
+data.export()           #exports the treesearch object as a pandas DataFrame
+~~~
+
+
+
+
+
 from treesearch import treesearch
 df = open('~aesop.xml', 'r', encoding="utf8").read()
 ~~~
