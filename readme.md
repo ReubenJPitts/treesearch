@@ -117,19 +117,19 @@ output = [165259, 165260]
 
 data.visualise(5, x=input, y=output)
 
+#The below tree will display with additional colour
+
 0 - 165257 -  - PRED - iovesat
 0 - 165257 - 165258 -  - SBJ - deivos
-0 - 165257 - 165258 - 165261 -  - ATR - mitat <span style="color:blue"><= query</span>
-0 - 165257 - 165258 - 165261 - 165259 - <span style="color:blue"> - SBJ - qoi</span>
-0 - 165257 - 165258 - 165261 - 165260 - <span style="color:blue"> - OBJ - med</span>
+0 - 165257 - 165258 - 165261 -  - ATR - mitat <= INPUT
+0 - 165257 - 165258 - 165261 - 165259 -  - SBJ - qoi <= OUTPUT
+0 - 165257 - 165258 - 165261 - 165260 -  - OBJ - med <= OUTPUT
 0 - 165262 -  - AuxC - nei
 0 - 165262 - 165267 -  - ADV - sied
 0 - 165262 - 165267 - 165265 -  - PNOM - cosmis
 0 - 165262 - 165267 - 165265 - 165264 -  - AuxP - endo
 0 - 165262 - 165267 - 165265 - 165264 - 165263 -  - ADV - ted
 0 - 165262 - 165267 - 165266 -  - SBJ - uirco
-
-
 ~~~
 
 The module revolves around word IDs (or Token_IDs), which are the basis of all syntactic functions. These IDs can be exchanged for various other forms of more human-interpretable information as follows:
@@ -194,6 +194,98 @@ A second set of syntactic functions understands coordination and aux relations, 
 data.smart_parents(100)                 #returns the true syntactic parent(s) of the current word id -> [102]
 data.smart_daughters(102)               #returns the true syntactic daughter(s) of the current word id -> [100, 101, 103]
 data.smart_siblings(100)                #returns fellow coordinands of the current word id (if any) -> [100]
+~~~
+
+Let's find a tree with some COORD and Aux, to illustrate the power of these functions.
+
+~~~
+lat = data.regex_subset("Language","Latin")       #let's limit to Latin for illustrative purposes
+cos = data.regex_subset("Relation","_CO")       #find some Token_IDs with "_CO"
+aux = data.regex_subset("Relation","Aux")       #find some Token_IDs with "Aux"
+
+s1 = [data.sentence_id(i) for i in cos]              #get the intersection of their Sentence_IDs (we're not just interested in individual words)
+s2 = [data.sentence_id(i) for i in aux]
+s3 = [data.sentence_id(i) for i in lat]
+
+s = list(set(s1) & set(s2) & set(s3))
+
+len(s)
+97
+~~~
+
+We can then "browse" through the 97 results using the visualisation function, until we find an interesting tree:
+
+~~~
+data.visualise(s[0])
+data.visualise(s[1])
+data.visualise(s[2])
+~~~
+
+For illustrative purposes, notice the inscription shown below:
+
+~~~
+data.visualise(s[6])
+
+0 - 418503 -  -  - [[e]]
+0 - 502035 -  - COORD - que
+0 - 502035 - 418501 -  - AuxP - apur
+0 - 502035 - 418501 - 418502 -  - ADV - finem
+0 - 502035 - 418501 - 418502 - 418504 -  - ATR - calicom(!)
+0 - 502035 - 418505 -  - AuxP - en
+0 - 502035 - 418505 - 418506 -  - ADV - urb/id
+0 - 502035 - 418505 - 418506 - 418507 -  - ATR - casontoni/a
+0 - 502035 - 418510 -  - PRED_CO - atolero
+0 - 502035 - 418510 - 418508 -  - SBJ - socie
+0 - 502035 - 418510 - 418509 -  - ADV - dono/m
+0 - 502035 - 418510 - 418511 -  - OBJ - actia
+0 - 502035 - 418510 - 418512 -  - AuxP - pro
+0 - 502035 - 418510 - 418512 - 418513 -  - ADV - l[ecio]nibus
+0 - 502035 - 418510 - 418512 - 418513 - 418514 -  - ATR - mar/tses
+0 - 502035 - 515240 -  - PRED_CO - -
+0 - 502035 - 515240 - 418497 -  - SBJ - caso
+0 - 502035 - 515240 - 418497 - 418498 -  - ATR - cantovio/s
+0 - 502035 - 515240 - 418497 - 418499 -  - ATR - aprufclano
+0 - 502035 - 515240 - 418500 -  - OBJ - cei/p()
+~~~
+
+Translation: At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.
+
+Imagine that we want to find the parent of *finem* "boundary" (Token_ID 418502). Using the "dumb" function, this finds:
+
+~~~
+t = data.direct_tree_parent(418502)
+t = data.token(t)
+
+apur
+~~~
+
+The preposition "apur", for some purposes, might be the right answer. However, for other purposes the syntactic head is likely to be the two coordinated predicates which this adverbial qualifies (Caso ??? and the allies brought ... at the Esalican boundary). The smart function ignores Aux and COORD and finds them, even though they are not syntactically superordinate:
+
+~~~
+t = data.smart_parents(418502)
+t = data.tokens(t)
+
+['atolero', '-']
+~~~
+
+Conversely, if we have the Token_ID of *atolero*, but we want to find the Token_ID of its (illegible) sister, we simply use:
+
+~~~
+t = data.smart_siblings(418510)
+t = data.tokens(t)
+
+['atolero', '-']
+~~~
+
+We get the same answer: the function understands that other topological coordinates, such as AuxP *apur*, are not its sisters. This function even returns the right answer with multiple layers of coordination embedded within each other.
+
+Finally, suppose we want to get the children of *atolero*, which means its own specific arguments and satellites, but also those it shares with its sibling *-* (but not those belonging exclusively to its sibling. This gives:
+
+~~~
+t = data.smart_children(418510)
+t = data.tokens(t)
+
+['finem', 'urb/id', 'socie', 'dono/m', 'actia', 'l[ecio]nibus']
 ~~~
 
 
