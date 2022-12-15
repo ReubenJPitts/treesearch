@@ -518,7 +518,7 @@ if table.shape == (2, 2):
 
 >**What are trivalent verbs likely to mean in an epigraphic corpus?**
 
-This query requires some different functions, and is quite a bit slower.
+This query requires some different functions.
 
 ~~~
 from treesearch import treesearch
