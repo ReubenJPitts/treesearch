@@ -76,7 +76,7 @@ data.show()
 Note that this dataframe contains more columns than the obligatory ones noted above. This makes more interesting linguistic queries possible.
 
 
-### Part 1: General Functionalities
+## General Functionalities
 
 A treesearch object is essentially a pandas DataFrame augmented with some further functions.
 
@@ -143,6 +143,7 @@ data.sentence_id(102)        #returns the sentence id of the specified word id -
 data.sentence(102)           #returns a list of all word ids in the same sentence -> [100, 101, 102, 103]
 data.pos(102)                #returns the POS tag of the current word id -> ""
 data.lemma(102)              #returns the lemma of the current word id -> "facio"
+data.information("Token_position",102)      #a more flexible function which deals with any columns that don't have custom functions
 ~~~
 
 As the "smart" functions below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
@@ -170,7 +171,7 @@ l = list(set(l1) & set(l2) & set(l3))
 
 
 
-### Part 2: Topological "Dumb" Functions
+## Topological "Dumb" Functions
 
 A first set of syntactic functions are described here as "topological" (or "dumb") functions, which just perform searches based on the tree topology and do not understand that syntactic relationships are not always hierarchical.
 
@@ -186,7 +187,7 @@ data.tree_children(102)                 #returns a list of all topological child
 For queries where coordination and Aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for more purposes (and much faster than the "smart" functions).
 
 
-### Part 3: Syntactic "Smart" Functions
+## Syntactic "Smart" Functions
 
 A second set of syntactic functions understands coordination and aux relations, and finds the tokens a researcher is likely to be primarily interested in.
 
