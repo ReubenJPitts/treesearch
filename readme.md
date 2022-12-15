@@ -93,6 +93,7 @@ data = treesearch(xml)
 data.show()             #prints the DataFrame
 data.show(1)            #prints the part of the DataFrame specified by the sentence id
 data.export()           #exports the treesearch object as a pandas DataFrame
+data.visualise(1)       #gives a simple visualisation of a tree using indentation
 ~~~
 
 
@@ -109,7 +110,28 @@ data.pos(102)                #returns the POS tag of the current word id -> ""
 data.lemma(102)              #returns the lemma of the current word id -> "facio"
 ~~~
 
-As the "smart" functions below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested in the word order of accusative objects,
+As the "smart" functions below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
+
+~~~
+data.subset("lemma","video1")            #returns a list of ids where lemma = "video1" -> [155, 162]
+data.subset("form","fefaked")            #returns a list of ids where form = "fefaked" -> [102]
+~~~
+
+If we wish to use more precise POS searches, the regex equivalent of this function should be used. So to filter accusative nouns:
+
+~~~
+data.regex_subset("pos","n......a.")            #returns a list of ids where the POS indicates an accusative noun -> [142, 152]
+~~~
+
+Use the intersection of lists to filter by multiple criteria
+
+data.subset("form","consilia")                  #returns ids where form = "consilia"
+data.regex_subset("pos",".......a.")            #returns ids where case = accusative
+data.regex_subset("pos","n........")            #returns ids where part of speech = noun
+
+list(set(lst1) & set(lst2))
+
+
 
 
 ## Part 2: Topological "Dumb" Functions
