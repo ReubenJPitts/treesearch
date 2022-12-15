@@ -252,7 +252,7 @@ data.visualise(s[6])
 0 - 502035 - 515240 - 418500 -  - OBJ - cei/p()
 ~~~
 
-Translation: *At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up (?) pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.* The syntactic analysis in this case is a little dubious, but the interpretation of the adverbials as dependent on both coordinated verbs will allow the "smart" syntactic functions to be demonstrated all the more clearly.
+Translation: *At the Esalican boundary in the city Casontonia, Caso Cantovios Aprufclanos set up (?) pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.* The syntactic analysis in this case is a little dubious, but the interpretation of the adverbials as dependent on both coordinated verbs will allow the "smart" syntactic functions to be demonstrated all the more clearly.
 
 Imagine that we want to find the parent of *finem* "boundary" (Token_ID 418502). Using the "dumb" function, this finds:
 
