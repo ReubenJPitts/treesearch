@@ -553,6 +553,8 @@ for i in l:
             result.append(True)                        # indicate trivalent verbs
         else:
             result.append(False)
+    else:
+        result.append(False)
 
 l = [j for i,j in enumerate(l) if result[i] == True]                # this is now a list of all trivalent verbs in the corpus
 l = [data.information("Classical_Latin_equivalent",i) for i in l]   # get the cross-linguistic Latin lemma
