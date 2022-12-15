@@ -299,7 +299,7 @@ Which is correct, and which a researcher will probably find more informative tha
 
 This is a step-by-step example of a complex linguistic query using the various functionalities of this module:
 
-> Are nominal accusative objects more likely to be preposed or postposed depending on whether or not they are in a main sentence, and does the answer vary from language to language?
+> **Are nominal accusative objects more likely to be preposed or postposed depending on whether or not they are in a main sentence, and does the answer vary from language to language?**
 
 First, import the CEIPoM database:
 
@@ -452,4 +452,108 @@ True               0    13
 ~~~
 
 Based on this quick heuristic, the Latin results in particular look worth exploring.
+
+> **Are genitives more likely to precede or follow their heads if they are personal names?**
+
+A similar query using some of the same functions:
+
+~~~
+from treesearch import treesearch
+
+df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
+data = treesearch(df)
+data.show()
+
+l = data.regex_subset("POS",".......g.")               # only genitives are of interest
+print(len(l))
+
+result = []
+check = []
+
+for i in l:
+    s = data.smart_siblings(i)                                  #get all fellow coordinands
+      
+    if sorted(s) in check:
+        continue                                                #if we've already had one of its coordinands, skip this iteration
+    check.append(sorted(s))                                     #remember its coordinands so that we don't do it twice
+    
+    proper = [data.information("Meaning_subcategory",i) for i in s]   
+    if len(proper) > 0:
+        proper = proper[0]
+    else:
+        proper = ""                                             #get the "Meaning_subcategory" of the siblings (this column specifies if a token is a personal name)
+   
+    s_pos = [data.information("Token_position",i) for i in s]   #get the position of coordinands (this is for word order: Token_ID is arbitrary in CEIPoM)
+    
+    p = data.smart_parents(i)                                   #get all parents
+    p_pos = [data.information("Token_position",i) for i in p]   #get the position of parents
+       
+    if len(p) > 0 and len(s) > 0 and max(s) < min(p):           #check if all coordinands precede all parents
+        order = True
+    elif len(p) > 0 and len(s) > 0 and max(p) < min(s):         #check if all parents precede all coordinands
+        order = False
+    else:                                                       #ignore weird cases where coordinands are intertwined
+        order = None
+
+    print(l.index(i),"of",len(l))                               #optional, to keep track of progress during long operations
+    result.append((i, proper, order))
+
+result = pd.DataFrame(result, columns=["Token_ID","Head_semantics","Head_follows"])              #turn into a DataFrame for easy interpretation
+result["Head_proper"] = [True if "PERSONAL" in i else False for i in result["Head_semantics"]]   #check if the Head is a PRED or not
+
+table = pd.crosstab(result.Head_follows,result.Head_proper)
+if table.shape == (2, 2):
+     from scipy.stats import fisher_exact
+     oddsratio, pvalue = fisher_exact([list(table.iloc[0]), list(table.iloc[1])])
+     print("pvalue =", pvalue)
+~~~
+
+>**What are trivalent verbs likely to mean in an epigraphic corpus?**
+
+This query requires some different functions, and is quite a bit slower.
+
+~~~
+from treesearch import treesearch
+
+df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
+data = treesearch(df)
+data.show()
+
+l = data.regex_subset("POS","v3.......")               # find only finite verb forms (1st and 2nd person forms are less common in epigraphy)
+
+nom = data.regex_subset("POS",".......n.")             # find all nominatives in the corpus
+dat = data.regex_subset("POS",".......d.")             # find all datives in the corpus
+acc = data.regex_subset("POS",".......a.")             # find all accusatives in the corpus
+
+result = []
+
+for i in l:
+    c = data.smart_children(i)                         # get the syntactic children of each finite verb form
+    if len(c) > 0:
+        r = [data.relation(i) for i in c]              # get the relations of those children
+        p = [data.information("POS",i) for i in c]     # get the POSes of those children
+        
+        p = ["NOM" if re.match(".......n.",i) != None else i for i in p]
+        p = ["ACC" if re.match(".......a.",i) != None else i for i in p]
+        p = ["DAT" if re.match(".......d.",i) != None else i for i in p]
+        
+        args = list(zip(r,p))                          # summarise the relevant information about the arguments
+        
+        if ("SBJ","NOM") in args and ("OBJ","ACC") in args and ("OBJ","DAT") in args:
+            result.append(True)                        # indicate trivalent verbs
+        else:
+            result.append(False)
+        
+        print(l.index(i),len(l))
+
+l = [j for i,j in enumerate(l) if result[i] == True]                # this is now a list of all trivalent verbs in the corpus
+l = [data.information("Classical_Latin_equivalent",i) for i in l]   # get the cross-linguistic Latin lemma
+
+from collections import Counter
+c = Counter(l)
+print(c.most_common(20))                                            # gives the 20 most common Latin lemmata
+~~~
+
+
+
 
