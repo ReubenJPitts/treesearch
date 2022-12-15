@@ -1,46 +1,13 @@
-## Querying Treebanks with Python: The *treesearch* Module
+# Querying Treebanks with Python: The *treesearch* Module
 
-### Introduction
+## Introduction
 
 The Python module *treesearch* contains a set of functions designed to query AGDT 2.0 treebanks. Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
 
 The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher. Additionally, the module is capable of checking whether trees are well-formed and warns the researcher of loops or other annotational errors.
 
 
-### Using the Module: A Simple Example
-
-~~~
-from treesearch import treesearch
-
-xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
-data = treesearch(xml)
-xml.show(1)
-~~~
-
-This shows the first sentence:
-~~~
-          Sentence_ID  Head Relation Lemma     Token
-Token_ID                                            
-100                 1   102      SBJ          manios
-101                 1   102      OBJ             med
-102                 1     0     PRED         fefaked
-103                 1   102      OBJ        numasioi
-~~~
-
-Some syntactic queries might be as follows:
-~~~
-xml.smart_children(102)
-[100, 101, 103]
-
-xml.smart_parents(100)
-[102]
-
-xml.tree_parents(100)
-[102, 0]
-~~~
-
-
-### Initialising the module
+## Initialising the module
 
 Having saved the treesearch.py file in your Python Module Search Path, summon it with
 
@@ -83,26 +50,93 @@ print(csv)
 5       105      horto   ADV_CO   104          200
 ~~~
 
+For the examples in this vademecum, the file in the Github repository can be summoned as:
+
+~~~
+df = pd.read_csv("CEIPoM_syntax.csv", delimiter=";")
+data = treesearch(df)
+data.show()
+
+        Sentence_ID  Token_position  ... Finite_verb Token_ID
+161279            1               1  ...       False   161279
+161280            1               2  ...       False   161280
+165252            2               1  ...        True   165252
+165253            2               2  ...        True   165253
+165254            2               3  ...        True   165254
+            ...             ...  ...         ...      ...
+152753         5481               9  ...        True   152753
+152754         5481              10  ...        True   152754
+152755         5481              11  ...        True   152755
+152756         5481              12  ...        True   152756
+152757         5481              13  ...        True   152757
+
+[37041 rows x 21 columns]
+~~~
+
+Note that this dataframe contains more columns than the obligatory ones noted above. This makes more interesting linguistic queries possible.
+
 
 ### Part 1: General Functionalities
 
 A treesearch object is essentially a pandas DataFrame augmented with some further functions.
 
 ~~~
-data = treesearch(xml)
+df = pd.read_csv("CEIPoM_syntax.csv", delimiter=";")
+data = treesearch(df)
+data.show()
 
 data.show()             #prints the DataFrame
-data.show(1)            #prints the part of the DataFrame specified by the sentence id
+data.show(2)            #prints the part of the DataFrame specified by the sentence id (example = Fibula Praenestina)
 data.export()           #exports the treesearch object as a pandas DataFrame
-data.visualise(1)       #gives a simple visualisation of a tree using indentation
+data.visualise(5)       #gives a simple visualisation of a tree using indentation (example = Duenos Vase)
 ~~~
 
-
-The module revolves around word IDs, which are the basis of all syntactic functions. These IDs can be exchanged for various other forms of more human-interpretable information as follows:
+The visualisation function returns something which should look like this, giving you a (simplistic) insight into the structure of the tree:
 
 ~~~
-data.form("fefaked")         #returns a list of all word ids for which the form is "fefaked" -> [102]
-data.token(102)              #returns the form for a given word id -> "fefaked"
+data.visualise(5)
+
+0 - 165257 -  - PRED - iovesat
+0 - 165257 - 165258 -  - SBJ - deivos
+0 - 165257 - 165258 - 165261 -  - ATR - mitat
+0 - 165257 - 165258 - 165261 - 165259 -  - SBJ - qoi
+0 - 165257 - 165258 - 165261 - 165260 -  - OBJ - med
+0 - 165262 -  - AuxC - nei
+0 - 165262 - 165267 -  - ADV - sied
+0 - 165262 - 165267 - 165265 -  - PNOM - cosmis
+0 - 165262 - 165267 - 165265 - 165264 -  - AuxP - endo
+0 - 165262 - 165267 - 165265 - 165264 - 165263 -  - ADV - ted
+0 - 165262 - 165267 - 165266 -  - SBJ - uirco
+~~~
+
+The visualisation function also allows the input and output of a query to be colourised. This is useful when checking an unexpected or outlier result. For instance, suppose smart_daughters(165261) returned [165259, 165260] and we want to check if there is anything wrong with the tree:
+
+~~~
+input = 165261                #input and output can be either integers or lists
+output = [165259, 165260]
+
+data.visualise(5, x=input, y=output)
+
+0 - 165257 -  - PRED - iovesat
+0 - 165257 - 165258 -  - SBJ - deivos
+0 - 165257 - 165258 - 165261 -  - ATR - mitat <span style="color:blue"><= query</span>
+0 - 165257 - 165258 - 165261 - 165259 - <span style="color:blue"> - SBJ - qoi</span>
+0 - 165257 - 165258 - 165261 - 165260 - <span style="color:blue"> - OBJ - med</span>
+0 - 165262 -  - AuxC - nei
+0 - 165262 - 165267 -  - ADV - sied
+0 - 165262 - 165267 - 165265 -  - PNOM - cosmis
+0 - 165262 - 165267 - 165265 - 165264 -  - AuxP - endo
+0 - 165262 - 165267 - 165265 - 165264 - 165263 -  - ADV - ted
+0 - 165262 - 165267 - 165266 -  - SBJ - uirco
+
+
+~~~
+
+The module revolves around word IDs (or Token_IDs), which are the basis of all syntactic functions. These IDs can be exchanged for various other forms of more human-interpretable information as follows:
+
+~~~
+data.form("deivos")          #returns a list of all word ids for which the form is "fefaked" -> [165258]
+data.token(165258)           #returns the form for a given word id -> "deivos"
 data.tokens([101,102])       #returns the form for a list of word ids -> ['med', 'fefaked']
 data.relation(102)           #returns the relation of the specified word id -> "PRED"
 data.sentence_id(102)        #returns the sentence id of the specified word id -> 1
@@ -161,6 +195,7 @@ data.smart_parents(100)                 #returns the true syntactic parent(s) of
 data.smart_daughters(102)               #returns the true syntactic daughter(s) of the current word id -> [100, 101, 103]
 data.smart_siblings(100)                #returns fellow coordinands of the current word id (if any) -> [100]
 ~~~
+
 
 ### Some More Complex Examples
 
