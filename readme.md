@@ -395,13 +395,18 @@ Impressionistically this does not look like a significant difference. Further su
 
 ~~~
 result = result.merge(df, how="left", on="Token_ID")
+from scipy.stats import fisher_exact
 
 for l in ["Latin","Oscan","Umbrian","Venetic","Messapic"]:
     subset = result[result["Language"] == l]
     table = pd.crosstab(subset.Head_follows,subset.Main_sentence)
     
-    print("\n", str(l))
+    print("\n", l)
     print(table)
+    
+    if table.shape == (2, 2):
+        oddsratio, pvalue = fisher_exact([list(table.iloc[0]), list(table.iloc[1])])
+        print("\n", l, "pvalue =", pvalue)
 
  Latin
 Main_sentence  False  True
@@ -409,17 +414,23 @@ Head_follows
 False             10    74
 True              57   173
 
+ Latin pvalue = 0.012993300539581828
+
  Oscan
 Main_sentence  False  True
 Head_follows              
 False              5     4
 True              41    59
 
+ Oscan pvalue = 0.48904526547139904
+
  Umbrian
 Main_sentence  False  True
 Head_follows              
 False              8    43
 True              63   318
+
+ Umbrian pvalue = 1.0
 
  Venetic
 Main_sentence  True
@@ -432,11 +443,9 @@ Main_sentence  False  True
 Head_follows              
 False              1     3
 True               0    13
+
+ Messapic pvalue = 0.23529411764705896
 ~~~
 
-Latin looks the most interesting result here, but no
-
-
-
-
+Based on this quick heuristic, the Latin results in particular look worth exploring.
 
