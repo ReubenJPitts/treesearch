@@ -46,6 +46,10 @@ Having saved the treesearch.py file in your Python Module Search Path, summon it
 
 ~~~
 from treesearch import treesearch
+
+#includes:
+#import pandas as pd
+#import re
 ~~~
 
 The module accepts csv files and xml files. In both cases, each token minimally to specify a "sentence id", "word id", "relation" and "head", otherwise the code will not work. Thus, for instance, an xml file can be imported as a string:
