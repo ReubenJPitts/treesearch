@@ -25,7 +25,7 @@ The module accepts csv files and xml files. In both cases, each token minimally 
 xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
 ~~~
 
-The xml will contain lines formatted as shown below. Word IDs can be numbered sequentially throughout the file, or start again from 1 in each sentence. As long as the word ID and head ID are annotated consistently, the module can deal with this. 
+The xml should contain lines formatted as shown below. Word IDs can be numbered sequentially throughout the file, or start again from 1 in each sentence. As long as the word ID and head ID are annotated consistently, the module can deal with this. 
 
 ~~~
 print(xml[1340:1770])
