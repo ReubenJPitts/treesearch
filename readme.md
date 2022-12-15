@@ -125,12 +125,13 @@ data.regex_subset("pos","n......a.")            #returns a list of ids where the
 
 Use the intersection of lists to filter by multiple criteria
 
-data.subset("form","consilia")                  #returns ids where form = "consilia"
-data.regex_subset("pos",".......a.")            #returns ids where case = accusative
-data.regex_subset("pos","n........")            #returns ids where part of speech = noun
+~~~
+l1 = data.subset("form","consilia")                  #returns ids where form = "consilia"
+l2 = data.regex_subset("pos",".......a.")            #returns ids where case = accusative
+l3 = data.regex_subset("pos","n........")            #returns ids where part of speech = noun
 
-list(set(lst1) & set(lst2))
-
+l = list(set(l1) & set(l2) & set(l3))
+~~~
 
 
 
