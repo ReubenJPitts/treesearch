@@ -4,23 +4,22 @@
 
 The Python module *treesearch* contains a set of functions designed to query AGDT 2.0 treebanks. Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
 
-The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher. Additionally, the module is capable of checking whether trees are well-formed and warns the researcher of loops or other annotational errors.
+The "smart" functions in the module understand how the treebanks work and return the forms that are of interest to the researcher.
 
 
 ## Initialising the module
 
-Having saved the treesearch.py file in your Python Module Search Path, summon it with
+Having saved the treesearch.py file in the Python Module Search Path, summon it with:
 
 ~~~
 from treesearch import treesearch
 
-#includes:
+#this includes:
 #import pandas as pd
-#import numpy as np
 #import re
 ~~~
 
-The module accepts csv files and xml files. In both cases, each token minimally to specify a "sentence id", "word id", "relation" and "head", otherwise the code will not work. Thus, for instance, an xml file can be imported as a string:
+The module accepts csv files and xml files. In both cases, each token minimally needs to specify a "Sentence_ID", "Token_ID", "Relation" and "Head", otherwise the code will not work (the code will convert the Perseids "word id", "sentence id", "relation" and "head" automatically). Thus, for instance, an xml file can be imported as a string:
 
 ~~~
 xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
@@ -87,14 +86,14 @@ data.show()
 
 data.show()             #prints the DataFrame
 data.show(2)            #prints the part of the DataFrame specified by the sentence id (example = Fibula Praenestina)
-data.export()           #exports the treesearch object as a pandas DataFrame
+data.export()           #turns the treesearch object into a regular pandas DataFrame
 data.visualise(5)       #gives a simple visualisation of a tree using indentation (example = Duenos Vase)
 ~~~
 
 The visualisation function returns something which should look like this, giving you a (simplistic) insight into the structure of the tree:
 
 ~~~
-data.visualise(5)
+data.visualise(5)       #visualise a tree by its Sentence_ID
 
 0 - 165257 -  - PRED - iovesat
 0 - 165257 - 165258 -  - SBJ - deivos
@@ -214,7 +213,7 @@ len(s)
 97
 ~~~
 
-We can then "browse" through the 97 results using the visualisation function, until we find an interesting tree:
+For heuristic purposes, we can now "browse" through the 97 results using the visualisation function, until we find an interesting tree:
 
 ~~~
 data.visualise(s[0])
@@ -249,7 +248,7 @@ data.visualise(s[6])
 0 - 502035 - 515240 - 418500 -  - OBJ - cei/p()
 ~~~
 
-Translation: At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.
+Translation: *At the Esalican bonudary in the city Casontonia, Caso Cantovios Aprufclanos set up pillars and his allies brought a sacred gift to Angitia on behalf of Marsian legions.* The syntactic analysis in this case is a little dubious, but this will allow the "smart" syntactic functions to be demonstrated all the more clearly.
 
 Imagine that we want to find the parent of *finem* "boundary" (Token_ID 418502). Using the "dumb" function, this finds:
 
@@ -260,7 +259,7 @@ t = data.token(t)
 apur
 ~~~
 
-The preposition "apur", for some purposes, might be the right answer. However, for other purposes the syntactic head is likely to be the two coordinated predicates which this adverbial qualifies (Caso ??? and the allies brought ... at the Esalican boundary). The smart function ignores Aux and COORD and finds them, even though they are not syntactically superordinate:
+The preposition "apur", for some purposes, might be the right answer. However, for other purposes the syntactic head is likely to be the two coordinated predicates which this adverbial qualifies (Caso set up? (illegible) and the allies brought ... at the Esalican boundary). The smart function ignores Aux and COORD and finds them, even though they are not syntactically superordinate:
 
 ~~~
 t = data.smart_parents(418502)
@@ -278,7 +277,7 @@ t = data.tokens(t)
 ['atolero', '-']
 ~~~
 
-We get the same answer: the function understands that other topological coordinates, such as AuxP *apur*, are not its sisters. This function even returns the right answer with multiple layers of coordination embedded within each other.
+We get the same answer: the function understands that other topological coordinates, such as AuxP *apur*, are not its sisters. This function even returns the right answer with multiple layers of coordination embedded within each other, and it understands when subordinate COORDs are recursive and when they are arguments of the coordinands of their superordinate COORD. In short, it just understands how the system works.
 
 Finally, suppose we want to get the children of *atolero*, which means its own specific arguments and satellites, but also those it shares with its sibling (but not those belonging exclusively to its sibling). This gives:
 
