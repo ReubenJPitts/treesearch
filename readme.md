@@ -1,5 +1,19 @@
 # Querying Treebanks with Python: The *treesearch* Module
 
+## Contents
+
+* Introduction
+
+* Initialising the Module
+
+* General functionalities
+
+* Topological "Dumb" Functions
+
+* Syntactic "Smart" Functions
+
+* Some More Complex Examples
+
 ## Introduction
 
 The Python module *treesearch* contains a set of functions designed to query AGDT 2.0 treebanks. Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
@@ -9,7 +23,7 @@ The "smart" functions in the module understand how the treebanks work and return
 The module is designed for small ("fragmentary") datasets where a researcher needs results to be accurate and exhaustive, and can't afford to miss results just because the tree topology does something funny. Examples are illustrated using the [CEIPoM](https://github.com/ReubenJPitts/Corpus-of-the-Epigraphy-of-the-Italian-Peninsula-in-the-1st-Millennium-BCE) database of ancient Italian epigraphy.
 
 
-## Initialising the module
+## Initialising the Module
 
 Having saved the treesearch.py file in the Python Module Search Path, summon it with:
 
@@ -305,7 +319,7 @@ Which is correct, and which a researcher will probably find more informative tha
 
 ## Some More Complex Examples
 
-This is a step-by-step example of a complex linguistic query using the various functionalities of this module:
+The following are some step-by-step examples of complex linguistic queries using the various functionalities of this module:
 
 > **Are nominal accusative objects more likely to be preposed or postposed depending on whether or not they are in a main sentence, and does the answer vary from language to language?**
 
