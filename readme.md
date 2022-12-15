@@ -279,7 +279,7 @@ t = data.tokens(t)
 
 We get the same answer: the function understands that other topological coordinates, such as AuxP *apur*, are not its sisters. This function even returns the right answer with multiple layers of coordination embedded within each other.
 
-Finally, suppose we want to get the children of *atolero*, which means its own specific arguments and satellites, but also those it shares with its sibling *-* (but not those belonging exclusively to its sibling. This gives:
+Finally, suppose we want to get the children of *atolero*, which means its own specific arguments and satellites, but also those it shares with its sibling (but not those belonging exclusively to its sibling). This gives:
 
 ~~~
 t = data.smart_children(418510)
@@ -288,32 +288,97 @@ t = data.tokens(t)
 ['finem', 'urb/id', 'socie', 'dono/m', 'actia', 'l[ecio]nibus']
 ~~~
 
+Which is correct, and which a researcher will probably find more informative than a string of Auxes.
 
-### Some More Complex Examples
 
-These examples show how to use the treesearch module to construct limitlessly complex syntactic searches. First import the CEIPoM database:
+## Some More Complex Examples
+
+This is a step-by-step example of a complex linguistic query using the various functionalities of this module:
+
+> Are nominal accusative objects more likely to be preposed or postposed depending on whether or not they are in a main sentence, and does the answer vary from language to language?
+
+First, import the CEIPoM database:
 
 ~~~
 from treesearch import treesearch
 
-xml = open('~CEIPoM.xml', 'r', encoding="utf8").read()
-data = treesearch(xml)
-
-show(data)
+df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
+data = treesearch(df)
+data.show()
 ~~~
 
-**Are objects more likely to be preposed or postposed?**
-
-At its most basic level, this search is relatively simple (and could be performed without the *treesearch* module):
+We could perform the syntactic part of the query first, and then filter out accusative nominals. However, the smart functions are slow, so this would be a huge waste of time. Instead, we filter the fast stuff first:
 
 ~~~
-l = data.subset("relation","OBJ")                 #first filter relevant word ids
-l = [(i,data.direct_tree_parent(i)) for i in l]   #get the parent of each id
-l = [i < j for i,j in l]                          #check if the head's token_id is greater or smaller
+l1 = data.regex_subset("POS",".......a.")               # only accusatives are of interest
+l2 = data.regex_subset("Relation","OBJ")                # only objects are of interest, note that regex will also get OBJ_CO
 
-l.count(True)
-l_count(False)
+l = list(set(l1) & set(l2))
+
+len(l)
+1108
 ~~~
+
+As this is a lot of results, it's a good idea to test the query on a subset first:
+
+~~~
+#l = l[:10]
+
+result = []
+check = []
+
+for i in l:
+    s = data.smart_siblings(i)                                  #get all fellow coordinands
+    
+    if sorted(s) in check:
+        continue                                                #if we've already had one of its coordinands, skip this iteration
+    check.append(sorted(s))                                     #remember its coordinands so that we don't do it twice
+    
+    s_pos = [data.information("Token_position",i) for i in s]   #get the position of coordinands (this is for word order: Token_ID is arbitrary in CEIPoM)
+    
+    p = data.smart_parents(i)                                   #get all parents
+    p_pos = [data.information("Token_position",i) for i in p]   #get the position of parents
+    
+    rel = data.relation(p)                                      #get the relation of parents (this function can handle lists)
+    
+    if max(s) < min(p):                                         #check if all coordinands precede all parents
+        order = True
+    elif max(p) < min(s):                                       #check if all parents precede all coordinands
+        order = False
+    else:                                                       #ignore weird cases where coordinands are intertwined
+        order = None
+
+    #print(l.index(i),l)                                        #optional, to keep track of progress during long operations
+    result.append((rel, order))
+~~~
+
+This gives a list of tuples, as follows:
+
+~~~
+[('PRED', True),
+ ('PRED', True),
+ ('PRED', True),
+ ('PRED', False),
+ ('PRED', True),
+ ('PRED', False),
+ ('PRED', False),
+ ('ATR', False),
+ ('PRED', True),
+ ('ADV', True)]
+~~~
+
+Now we can calcate
+
+
+
+
+
+
+
+
+
+
+
 
 However, objects may be coordinated (thus OBJ_CO), and we don't want to count them twice. Moreover, if they're linked to their head via an Aux, or if their head is coordinated, or if their head isn't topologically superordinate, we don't want to miss them.
 
