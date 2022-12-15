@@ -4,9 +4,9 @@
 
 * Introduction
 
-* Initialising the Module
+* Initialising *treesearch*
 
-* General functionalities
+* General Functionalities
 
 * Topological "Dumb" Functions
 
@@ -23,7 +23,7 @@ The "smart" functions in the module understand how the treebanks work and return
 The module is designed for small ("fragmentary") datasets where a researcher needs results to be accurate and exhaustive, and can't afford to miss results just because the tree topology does something funny. Examples are illustrated using the [CEIPoM](https://github.com/ReubenJPitts/Corpus-of-the-Epigraphy-of-the-Italian-Peninsula-in-the-1st-Millennium-BCE) database of ancient Italian epigraphy.
 
 
-## Initialising the Module
+## Initialising *treesearch*
 
 Having saved the treesearch.py file in the Python Module Search Path, summon it with:
 
