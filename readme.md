@@ -111,7 +111,7 @@ data.visualise(5)       #visualise a tree by its Sentence_ID
 
 The visualisation function also allows the input and output of a query to be colourised. This is useful when checking an unexpected or outlier result. For instance, suppose smart_daughters(165261) returned [165259, 165260] and we want to check if there is anything wrong with the tree:
 
-~~~c
+~~~
 input = 165261                #input and output can be either integers or lists
 output = [165259, 165260]
 
