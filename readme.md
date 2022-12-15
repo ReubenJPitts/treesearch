@@ -341,75 +341,100 @@ for i in l:
     
     rel = data.relation(p)                                      #get the relation of parents (this function can handle lists)
     
-    if max(s) < min(p):                                         #check if all coordinands precede all parents
+    if len(p) > 0 and len(s) > 0 and max(s) < min(p):           #check if all coordinands precede all parents
         order = True
-    elif max(p) < min(s):                                       #check if all parents precede all coordinands
+    elif len(p) > 0 and len(s) > 0 and max(p) < min(s):         #check if all parents precede all coordinands
         order = False
     else:                                                       #ignore weird cases where coordinands are intertwined
         order = None
 
-    #print(l.index(i),l)                                        #optional, to keep track of progress during long operations
-    result.append((rel, order))
+    #print(l.index(i),i)                                        #optional, to keep track of progress during long operations
+    result.append((i, rel, order))
+
+result = pd.DataFrame(result, columns=["Token_ID","Head_relation","Head_follows"])            #turn into a DataFrame for easy interpretation
+result["Main_sentence"] = [True if "PRED" in i else False for i in result["Head_relation"]]   #check if the Head is a PRED or not
 ~~~
 
-This gives a list of tuples, as follows:
+This gives the following result DataFrame:
 
 ~~~
-[('PRED', True),
- ('PRED', True),
- ('PRED', True),
- ('PRED', False),
- ('PRED', True),
- ('PRED', False),
- ('PRED', False),
- ('ATR', False),
- ('PRED', True),
- ('ADV', True)]
+   Token_ID Head_relation  Head_follows  Main_sentence
+0    155649          PRED          True           True
+1    143364          PRED          True           True
+2    151561          PRED          True           True
+3    159756          PRED         False           True
+4    155664          PRED          True           True
+5    157715          PRED         False           True
+6    157718          PRED         False           True
+7    159767           ATR         False          False
+8    155672          PRED          True           True
+9    159775           ADV          True          False
 ~~~
 
-Now we can calcate
-
-
-
-
-
-
-
-
-
-
-
-
-However, objects may be coordinated (thus OBJ_CO), and we don't want to count them twice. Moreover, if they're linked to their head via an Aux, or if their head is coordinated, or if their head isn't topologically superordinate, we don't want to miss them.
-
-This is where the *treesearch* module becomes useful. We formulate the same query, but with a smart function:
+The desired summary statistics can then be calculated easily, as shown below. It is also simple to merge the result DataFrame with the original CEIPoM DataFrame, in order to retrieve the geographical and chronological information that might be of interest for a more in-depth linguistic analysis.
 
 ~~~
-l = data.regex_subset("relation","OBJ.*")         #so that we don't filter out OBJ_CO
+table = pd.crosstab(result.Head_follows,result.Main_sentence)
 
-result = []
-check = []
+Main_sentence  False  True
+Head_follows              
+False              1     3
+True               1     5
+~~~
 
-for i in l:
-    s = data.smart_siblings(i)                    #get all fellow coordinands
-    if sorted(s) in check:
-        continue                                  #if we've already had one of its coordinands, skip this iteration
-    check.append(sorted(s))
-    p = data.smart_parents(i)                     #get all parents
+When performed with the full set of 1108 results:
+
+~~~
+Main_sentence  False  True
+Head_follows              
+False             24   136
+True             162   605
+~~~
+
+Impressionistically this does not look like a significant difference. Further subdivision by language is possible when we link the rest of CEIPoM with the result table:
+
+~~~
+result = result.merge(df, how="left", on="Token_ID")
+
+for l in ["Latin","Oscan","Umbrian","Venetic","Messapic"]:
+    subset = result[result["Language"] == l]
+    table = pd.crosstab(subset.Head_follows,subset.Main_sentence)
     
-    if max(s) < min(p):                           #check if all coordinands precede all parents
-        result.append(True)
-    elif max(p) < min(s):                         #check if all parents precede all coordinands
-        result.append(False)
-    else:                                         #some objects precede while others follow, and similar cases
-        result.append(None)
+    print("\n", str(l))
+    print(table)
 
-l.count(True)
-l_count(False)
+ Latin
+Main_sentence  False  True
+Head_follows              
+False             10    74
+True              57   173
+
+ Oscan
+Main_sentence  False  True
+Head_follows              
+False              5     4
+True              41    59
+
+ Umbrian
+Main_sentence  False  True
+Head_follows              
+False              8    43
+True              63   318
+
+ Venetic
+Main_sentence  True
+Head_follows       
+False             9
+True             36
+
+ Messapic
+Main_sentence  False  True
+Head_follows              
+False              1     3
+True               0    13
 ~~~
 
-**Are objects more likely to be preposed or postposed depending on whether they are in a main clause or not?**
-
+Latin looks the most interesting result here, but no
 
 
 
