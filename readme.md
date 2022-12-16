@@ -655,6 +655,7 @@ data.smart_siblings(i)           			# returns the true syntactic siblings of the
 ~~~
 
 **(7) Diagnosing diseased trees**
+
 These are check functions, which return True if a tree is okay, False if it is not
 
 ~~~
