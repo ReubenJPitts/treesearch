@@ -623,7 +623,7 @@ data.direct_tree_parent(i)            # returns the direct topological parent of
 data.tree_parents(i)                  # returns a list of topological parents all the way to the root of the current Token_ID *i*
 data.direct_tree_children(i)          # returns a list of the direct topological children of the current Token_ID *i*
 data.tree_children(i)                 # returns a list of all topological children of the current Token_ID *i*
-data.tree_siblings                    # returns a list of all Token_IDs sharing the same topological parent
+data.tree_siblings(i)                 # returns a list of all Token_IDs sharing the same topological parent
 ~~~
 
 **(5) Ancillary functions**
@@ -633,9 +633,9 @@ These functions are unlikely to be useful on their own but are required for the 
 ~~~
 data.check_relation(r,[i,j,...])      # filters a list of Token_IDs by a Relation *r*
 data.same_tree_parents(i)             # returns a list of topological parents as long as they share the Relation of the current Token_ID *i*
-data.same_tree_children               # returns a list of all topological children as long as they share the Relation of the current Token_ID *i*
-data.direct_aux_parent                # returns the direct topological parent, while skipping aux nodes, of the current Token_ID *i*
-data.direct_aux_children              # returns the direct topological children, while skipping aux nodes, of the current Token_ID *i*
+data.same_tree_children(i)            # returns a list of all topological children as long as they share the Relation of the current Token_ID *i*
+data.direct_aux_parent(i)             # returns the direct topological parent, while skipping aux nodes, of the current Token_ID *i*
+data.direct_aux_children(i)           # returns the direct topological children, while skipping aux nodes, of the current Token_ID *i*
 data.check_if_co(i,r)                 # returns True or False depending if a Token_ID *i* either is, or governs as Aux, a relevant instance of a coordinative relationship in "_CO"
 data.check_coord(i)                   # returns the Relation that a Token_ID *i* of a COORD is coordinating
 data.get_coord(i)                     # returns a list of hierarchically related COORDs, plus the current COORD with Token_ID *i*
@@ -643,8 +643,8 @@ data.get_coord_up(i)                  # returns a list of hierarchically related
 data.get_coord_down(i)                # returns a list of hierarchically related COORDs searching only downwards, plus the current COORD with Token_ID *i*
 data.direct_co_children(i)            # returns the tokens that a Token_ID *i* of a COORD is coordinating
 data.direct_aux_co_children(i)        # returns the tokens that a Token_ID *i* of a COORD is coordinating, skipping aux nodes
-data.direct_nonco_children            # returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating
-data.direct_aux_nonco_children        # returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating, skipping aux nodes
+data.direct_nonco_children(i)         # returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating
+data.direct_aux_nonco_children(i)     # returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating, skipping aux nodes
 ~~~
 
 **(6) Syntactic "smart" functions**
