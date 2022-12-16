@@ -64,7 +64,7 @@ def unique_token_ids(df):
     return df
     #modifies dataframes where token_id count starts from 1 in each sentence
     
-class treesearch:
+class TreeSearch:
     
     ### 0 ### INITIALISE A DATAFRAME
     def __init__(self, data):
