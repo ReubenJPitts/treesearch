@@ -154,17 +154,17 @@ data.visualise(5, x=input, y=output)
 0 - 165262 - 165267 - 165266 -  - SBJ - uirco
 ~~~
 
-The module revolves around word IDs (or Token_IDs), which are the basis of all syntactic functions. These IDs can be exchanged for various other pieces of information using a number of simple functions such as the following:
+The module revolves around Token_IDs, which are the basis of all syntactic functions. These IDs can be exchanged for various other pieces of information using a number of simple functions such as the following:
 
 ~~~
-data.form("deivos")             #returns a list of all word ids for which the form is "deivos" (-> [165258])
-data.token(165258)              #returns the form for a given word id (in this case -> "deivos")
-data.tokens([165258,165259])    #returns the form for a list of word ids
-data.relation(165258)           #returns the relation of the specified word id (if given a list, will try to give the relation of its first element)
-data.sentence_id(165258)        #returns the sentence id of the specified word id
-data.sentence(165258)           #returns a list of all word ids in the same sentence
-data.pos(165258)                #returns the POS tag of the current word id (if there is one)
-data.lemma(165258)              #returns the lemma of the current word id (if there is one)
+data.form("deivos")             #returns a list of all Token_IDs for which the Token is "deivos" (-> [165258])
+data.token(165258)              #returns the Token for a given Token_ID (in this case -> "deivos")
+data.tokens([165258,165259])    #returns the Token for a list of Token_IDs
+data.relation(165258)           #returns the Relation of the specified Token_ID (if given a list, will try to give the relation of its first element)
+data.sentence_id(165258)        #returns the Sentence_ID of the specified Token_ID
+data.sentence(165258)           #returns a list of all Token_IDs in the same sentence
+data.pos(165258)                #returns the POS tag of the current Token_ID (if there is one)
+data.lemma(165258)              #returns the Lemma of the current Token_ID (if there is one)
 
 data.information("Token_position",165258)      #a more flexible function which deals with any columns that don't have custom functions
 ~~~
@@ -172,22 +172,22 @@ data.information("Token_position",165258)      #a more flexible function which d
 As the "smart" functions introduced below can be quite slow, it can speed up searches to first filter a list of relevant tokens based on morphological or formal criteria. For example, suppose we are interested only in the syntactic function of forms of *facio*, we can use:
 
 ~~~
-data.subset("Lemma","10350a")                  #returns a list of ids where lemma = "10350a"
-data.subset("Token","fefaked")                 #returns a list of ids where form = "fefaked"
+data.subset("Lemma","10350a")                  #returns a list of Token_IDs where Lemma = "10350a"
+data.subset("Token","fefaked")                 #returns a list of Token_IDs where Token = "fefaked"
 ~~~
 
 If we wish to use more precise POS searches, the regex equivalent of this function should be used. So to filter accusative nouns:
 
 ~~~
-data.regex_subset("pos","n......a.")           #returns a list of ids where the POS indicates an accusative noun
+data.regex_subset("POS","n......a.")           #returns a list of ids where the POS indicates an accusative noun
 ~~~
 
 Use the intersection of lists to filter by multiple criteria
 
 ~~~
-l1 = data.subset("Token","consilia")           #returns ids where form = "consilia"
-l2 = data.regex_subset("pos",".......a.")      #returns ids where case = accusative
-l3 = data.regex_subset("pos","n........")      #returns ids where part of speech = noun
+l1 = data.subset("Token","consilia")           #returns ids where Token = "consilia"
+l2 = data.regex_subset("POS",".......a.")      #returns ids where Case = accusative
+l3 = data.regex_subset("POS","n........")      #returns ids where Part of Speech = noun
 
 l = list(set(l1) & set(l2) & set(l3))
 ~~~
@@ -209,7 +209,7 @@ data.direct_tree_children(165258)          #returns a list of direct topological
 data.tree_children(165258)                 #returns a list of all topological children (regardless of how many nodes removed)
 ~~~
 
-For queries where coordination and Aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for more purposes (and much faster than the "smart" functions).
+For queries where coordination and aux relations are irrelevant, or datasets large enough that such cases can be ignored, these functions may be sufficient for many purposes (and are much faster than the "smart" functions).
 
 
 ## Syntactic "Smart" Functions
@@ -218,7 +218,7 @@ A second set of syntactic functions understands coordination and aux relations, 
 
 ~~~
 data.smart_parents(165258)                 #returns the true syntactic parent(s) of the current word id
-data.smart_daughters(165258)               #returns the true syntactic daughter(s) of the current word id
+data.smart_daughters(165258)               #returns the true syntactic daughter(s) of the current word id (the slowest function!)
 data.smart_siblings(165258)                #returns fellow coordinands of the current word id (if any)
 ~~~
 
