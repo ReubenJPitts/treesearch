@@ -21,6 +21,7 @@ def adapt_csv(df):
     df['Sentence_ID'] = df['Sentence_ID'].fillna(0).astype(int)
     df['Token_ID'] = df['Token_ID'].fillna(0).astype(int)
     df['Head'] = df['Head'].fillna(0).astype(int)
+    df = df.fillna("")
     return df
     #adds some resilience to csvs with slightly different titles
     
@@ -169,7 +170,6 @@ class treesearch:
         #a more general function for filtering a dataframe based on a column
 
     def regex_subset(self, column, i):
-        column = column.replace("head","Head").replace("relation","Relation").replace("postag","POS").replace("pos","POS").replace("word id","Token_ID").replace("sentence id","Sentence_ID").replace("lemma","Lemma").replace("form","Token")
         return list(self.df[self.df[column].str.contains(i, regex=True)].index)
         #a more general function for filtering a dataframe based on a column, using regex
         
@@ -391,7 +391,7 @@ class treesearch:
     def smart_children(self, i):
         if "Aux" in self.relation(i):
             child = self.direct_tree_children(i)
-            if self.relation(child[0]) == "COORD":
+            if len(child) > 0 and self.relation(child[0]) == "COORD":
                 return self.direct_aux_co_children(child[0])
             else:
                 return child
