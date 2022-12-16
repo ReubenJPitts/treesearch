@@ -30,7 +30,7 @@ The module is designed for small ("fragmentary") datasets where a researcher nee
 Having saved the treesearch.py file in the Python Module Search Path, summon it with:
 
 ~~~
-from treesearch import treesearch
+from treesearch import TreeSearch
 ~~~
 
 This also imports the dependencies pandas and re.
@@ -52,14 +52,14 @@ The xml should contain lines formatted as shown below. Word IDs can be numbered 
 A treesearch object is created with:
 
 ~~~
-data = treesearch(xml)
+data = TreeSearch(xml)
 ~~~
 
 A csv file, meanwhile, can be imported through a similar process: 
 
 ~~~
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 ~~~
 
 The *treesearch* module will convert both the csv and the xml into a pandas DataFrame for all subsequent operations.
@@ -68,11 +68,11 @@ For the examples in this vademecum, the file in the Github repository can be sum
 
 ~~~
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 
 #OR 
 xml = open('~CEIPoM_syntax.xml', 'r', encoding="utf8").read()
-data = treesearch(xml)
+data = TreeSearch(xml)
 #However, note that this xml doesn't contain Lemma & POS information, so the examples will use the csv import
 
 data.show()
@@ -97,11 +97,11 @@ Note that this DataFrame contains more columns than the obligatory ones noted ab
 
 ## General Functionalities
 
-A treesearch object is essentially a pandas DataFrame augmented with some further functions.
+A TreeSearch object is essentially a pandas DataFrame augmented with some further functions.
 
 ~~~
 df = pd.read_csv("CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 data.show()
 
 data.show()             #prints the DataFrame
@@ -323,10 +323,10 @@ The following are some step-by-step examples of complex linguistic queries using
 First, import the CEIPoM database:
 
 ~~~
-from treesearch import treesearch
+from treesearch import TreeSearch
 
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 data.show()
 ~~~
 
@@ -477,10 +477,10 @@ Based on this quick heuristic, the Latin results in particular look worth explor
 A similar query using some of the same functions:
 
 ~~~
-from treesearch import treesearch
+from treesearch import TreeSearch
 
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 data.show()
 
 l = data.regex_subset("POS",".......g.")               # only genitives are of interest
@@ -532,10 +532,10 @@ if table.shape == (2, 2):
 This query requires some different functions.
 
 ~~~
-from treesearch import treesearch
+from treesearch import TreeSearch
 
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
-data = treesearch(df)
+data = TreeSearch(df)
 data.show()
 
 l = data.regex_subset("POS","v3.......")               # find only finite verb forms (1st and 2nd person forms are less common in epigraphy)
