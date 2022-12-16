@@ -38,17 +38,15 @@ This also imports the dependencies pandas and re.
 The module accepts csv files and xml files. In both cases, each token minimally needs to specify a "Sentence_ID", "Token_ID", "Relation" and "Head", otherwise the code will not work (the code will convert the Perseids headings "word id", "sentence id", "relation" and "head" automatically). Thus, for instance, an xml file can be imported as a string:
 
 ~~~
-xml = open('~sample_trees.xml', 'r', encoding="utf8").read()
+xml = open('~CEIPoM_syntax.xml', 'r', encoding="utf8").read()
 ~~~
 
 The xml should contain lines formatted as shown below. Word IDs can be numbered sequentially throughout the file, or start again from 1 in each sentence. As long as the word ID and head ID are annotated consistently, the module can deal with this. 
 
 ~~~
-print(xml[1340:1770])
-  <sentence id='1' document_id='' subdoc='1' span=''>
-    <word id='1' form='Ἀγαθὰ' lemma='ἀγαθός' postag='a-p---nn-' relation='ExD_CO' ref='' sg='sbs nmn ind ctc' gloss='good' head='2'/>
-    <word id='2' form='καὶ' lemma='καί' postag='c--------' relation='COORD' ref='' sg='' gloss='and' head='0'/>
-    <word id='3' form='κακά' lemma='κακός' postag='a-p---nn-' relation='ExD_CO' ref='' sg='sbs nmn ind ctc' gloss='bad' head='2'/>
+   <sentence id="2" document_id="" subdoc="" span="">
+      <word id="1" form="257321: salvetod" lemma="" postag="" relation="PRED" head="0"/>
+      <word id="2" form="257322: tita" lemma="" postag="" relation="ExD" head="1"/>
 ~~~
 
 A treesearch object is created with:
@@ -60,16 +58,7 @@ data = treesearch(xml)
 A csv file, meanwhile, can be imported through a similar process: 
 
 ~~~
-df = pd.read_csv("treebank.csv", delimiter=";")
-print(df)
-    word id       form relation  head  sentence id
-0       100        heu      Aux     0          200
-1       101        ego      SBJ   112          200
-2       102         in     AuxP   112          200
-3       103       domo   ADV_CO   104          200
-4       104         et    COORD   102          200
-5       105      horto   ADV_CO   104          200
-
+df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
 data = treesearch(df)
 ~~~
 
@@ -80,6 +69,12 @@ For the examples in this vademecum, the file in the Github repository can be sum
 ~~~
 df = pd.read_csv("~CEIPoM_syntax.csv", delimiter=";")
 data = treesearch(df)
+
+#OR 
+xml = open('~CEIPoM_syntax.xml', 'r', encoding="utf8").read()
+data = treesearch(xml)
+#However, note that this xml doesn't contain Lemma & POS information, so the examples will use the csv import
+
 data.show()
 
         Sentence_ID  Token_position  ... Finite_verb Token_ID
