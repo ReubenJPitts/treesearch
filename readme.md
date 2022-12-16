@@ -14,6 +14,8 @@
 
 * Some More Complex Examples
 
+* Summary of All Module Functions
+
 ## Introduction
 
 The Python module *treesearch* contains a set of functions designed to query treebanks following the [AGDT 2 annotation scheme](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md). Specifically, it is equipped to deal with auxiliaries, where a syntactic relationship may be mediated by a node which is not of interest, and coordinate structures, where syntactically subordinate nodes may be topologically coordinate or superordinate (or vice versa).
@@ -578,6 +580,78 @@ c = Counter(l)
 print(c.most_common(20))                                            # gives the 20 most common Latin lemmata
 ~~~
 
+## Summary of All Module Functions
+
+
+
+data.show()				# show current *treesearch* object
+data.show(s)				# show subset of current *treesearch* object defined by a Sentence_ID *s*
+data.show_ids([i,j,...])		# show subset of current *treesearch* object defined by a list of Token_IDs
+data.export()				# return the current *treesearch* object as a dataframe
+data.export(s)				# return subset of current *treesearch* object defined by a Sentence_ID *s*
+
+
+data.form(f)				# return a list of the Token_IDs for which the Token form constitutes the string "f"
+data.relation(i)			# return the relation of the current Token_ID *i*
+data.relation([i,j,...])		# return the relation of the first Token_ID in a list
+data.pos(i)				# return the POS of the current Token_ID *i*
+data.lemma(i)				# return the Lemma of the current Token_ID *i*
+data.token(i)				# return the Token (form) of the current Token_ID *i*
+data.tokens([i,j,...])			# return a list of Tokens (forms) correspond to a list of Token_IDs
+data.information(column,i)		# return the value in any column for the current Token_ID *i*
+
+data.sentence_id(i)			# return the Sentence_ID of the current Token_ID *i*
+data.sentence(i)			# return all other Token_IDs in the same sentence as the current Token_ID *i*
+data.treetop(i)				# return the Token_IDs whose Head is the root (0) in the same sentence as the current Token_ID *i*
+
+data.subset(column,i)			# filter a dataframe based on a value i in any column
+data.regex_subset(column,i)		# filter a dataframe based on a regex expression i in any column
+
+data.visualise(s, x=None, y=None)	# visualise a tree based on a Sentence_ID s, if desired colourising input x and output y (take integers or lists)
+
+data.check_relation(r,[i,j,...])	# filters a list of Token_IDs by a Relation *r*
+
+data.direct_tree_parent(i)		# return the direct topological parent of the current Token_ID *i* as an integer
+data.tree_parents(i)			# return a list of topological parents all the way to the root of the current Token_ID *i*
+
+data.same_tree_parents(i)		# return a list of topological parents as long as they share the Relation of the current Token_ID *i*
+
+data.direct_tree_children(i)		# return a list of the direct topological children of the current Token_ID *i*
+data.tree_children(i)			# return a list of all topological children of the current Token_ID *i*
+
+data.same_tree_children			# return a list of all topological children as long as they share the Relation of the current Token_ID *i*
+
+data.tree_siblings			# return a list of all Token_IDs sharing the same topological parent
+
+data.direct_aux_parent			# return the direct topological parent, while skipping aux nodes, of the current Token_ID *i*
+data.direct_aux_children		# return the direct topological children, while skipping aux nodes, of the current Token_ID *i*
+
+data.check_if_co(i,r)			# returns True or False depending if a Token_ID *i* either is, or governs as Aux, a relevant instance of a coordinative relationship in "_CO"
+data.check_coord(i)			# returns the Relation that a Token_ID *i* of a COORD is coordinating
+data.get_coord(i)			# returns a list of hierarchically related COORDs, plus the current COORD with Token_ID *i*
+data.get_coord_up(i)			# returns a list of hierarchically related COORDs searching only upwards, plus the current COORD with Token_ID *i*
+data.get_coord_down(i)			# returns a list of hierarchically related COORDs searching only downwards, plus the current COORD with Token_ID *i*
+data.direct_co_children(i)		# returns the tokens that a Token_ID *i* of a COORD is coordinating
+data.direct_aux_co_children(i)		# returns the tokens that a Token_ID *i* of a COORD is coordinating, skipping aux nodes
+data.direct_nonco_children		# returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating
+data.direct_aux_nonco_children		# returns the subordinate tokens that a Token_ID *i* of a COORD is NOT coordinating, skipping aux nodes
+
+data.smart_parents(i)			# returns the true syntactic parents of the current Token_ID *i*
+data.smart_children(i)			# returns the true syntactic children of the current Token_ID *i* (slow)
+data.smart_siblings(i)			# returns the true syntactic siblings of the current Token_ID *i*
+
+#### Diagnosing diseased trees
+All these functions return True if the tree is okay, False if it is not
+
+~~~
+data.check_tree_root(s)			# checks if a tree defined by Sentence_ID *s* has a root
+data.check_tree_complete_heads(s)	# checks if all Token_IDs in a tree defined by Sentence_ID *s* have Heads
+data.check_tree_complete_relations(s)	# checks if all Token_IDs in a tree defined by Sentence_ID *s* have Relations
+data.check_tree_loops(s)		# checks if a tree defined by Sentence_ID *s* contains any loops
+data.check_tree_aux_children(s)		# checks if a tree defined by Sentence_ID *s* contains any illegal aux relations
+data.check_tree_aux_co(s)		# checks if a tree defined by Sentence_ID *s* contains any noxious composites of diagnostic substrings
+data.check_tree_coord(s)		# checks if all instances of COORD have an identifiable coordinand Relation
+~~~
 
 
 
